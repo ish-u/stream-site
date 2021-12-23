@@ -1,22 +1,22 @@
 version: "3"
 services:
-  # server:
-  #   build: ./server
-  #   ports:
-  #     - 5000:5000
-  #   depends_on:
-  #     - "mongodb"
-  #   container_name: server
-  # rtmp:
-  #   build: ./rtmp_server
-  #   ports:
-  #     - "1935:1935"
-  #     - "8000:8000"
-  #   container_name: rtmp_server
-  #   depends_on:
-  #     - server
-  #   volumes:
-  #     - ./data:/temp/hls
+  server:
+    build: ./server
+    ports:
+      - 5000:5000
+    depends_on:
+      - "mongodb"
+    container_name: server
+  rtmp:
+    build: ./rtmp_server
+    ports:
+      - "1935:1935"
+      - "8000:8000"
+    container_name: rtmp_server
+    depends_on:
+      - server
+    volumes:
+      - ./data:/temp/hls
   mongodb:
     image: mongo
     ports:
