@@ -24,8 +24,8 @@ docker-compose up
 
 ### References
 
-    - MongoDB : `http://localhost:27017/`
-    - MongoExpress: `http://localhost:8080`
-    - RTMP Server : `http://localhost:1935`
-    - HLS Feed: `http://localhost:8000`
-    - Express Server - `http://localhost:5000`
+- MongoDB : `http://localhost:27017/`
+- MongoExpress: `http://localhost:8080`
+- RTMP Server : `http://localhost:1935`
+- HLS Feed: `http://localhost:8000`
+- Express Server - `http://localhost:5000`
