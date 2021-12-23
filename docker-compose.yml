@@ -1,0 +1,42 @@
+version: "3"
+services:
+  # server:
+  #   build: ./server
+  #   ports:
+  #     - 5000:5000
+  #   depends_on:
+  #     - "mongodb"
+  #   container_name: server
+  # rtmp:
+  #   build: ./rtmp_server
+  #   ports:
+  #     - "1935:1935"
+  #     - "8000:8000"
+  #   container_name: rtmp_server
+  #   depends_on:
+  #     - server
+  #   volumes:
+  #     - ./data:/temp/hls
+  mongodb:
+    image: mongo
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - mongo-data:/data/db
+  mongo-express:
+    image: mongo-express
+    ports:
+      - 8080:8081
+    depends_on:
+      - "mongodb"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+volumes:
+  mongo-data:
+    driver: local
+
