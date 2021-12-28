@@ -22,7 +22,10 @@ app.use("/api", auth, cors());
 app.use("/api", api, cors());
 
 // for 404
-app.use("*", (req, res) => res.json({ error: "error" }));
+app.use("*", (req, res) => {
+  res.status(500);
+  res.json({ error: "error" });
+});
 
 // exporting the App
 export default app;

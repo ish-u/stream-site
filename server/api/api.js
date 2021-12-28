@@ -55,10 +55,54 @@ router.get("/user/:username", async (req, res) => {
       { password: 0, _id: 0, streamKey: 0, email: 0 }
     );
     if (user !== null) {
+      // finding a
       res.status(200);
       res.send(user);
     } else {
       res.sendStatus(701);
+    }
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(701);
+  }
+});
+
+// follow a user
+router.patch("/follow/:username", authenticateToken, async (req, res) => {
+  try {
+    const currentUser = req.user.username;
+    const userToFollow = req.params.username;
+    const currentUserDocument = await User.findOne({ username: currentUser });
+    const userToFollowDocument = await User.findOne({
+      username: userToFollow,
+    });
+
+    console.log(
+      currentUser,
+      currentUserDocument,
+      userToFollow,
+      userToFollowDocument
+    );
+    if (currentUserDocument !== null && userToFollowDocument !== null) {
+      var currentUserFollowing = currentUserDocument.following;
+      var userToFollowFollowers = userToFollowDocument.followers;
+      if (
+        !currentUserFollowing.includes(userToFollowDocument._id) &&
+        !userToFollowFollowers.includes(currentUserDocument._id)
+      ) {
+        // updating user following
+        console.log(currentUserFollowing, userToFollowFollowers);
+        currentUserFollowing.push(userToFollowDocument._id);
+        currentUserDocument.following = currentUserFollowing;
+        await currentUserDocument.save();
+        // updating followed user followers
+        userToFollowFollowers.push(currentUserDocument._id);
+        userToFollowDocument.followers = userToFollowFollowers;
+        await userToFollowDocument.save();
+        res.sendStatus(200);
+      } else {
+        res.sendStatus(701);
+      }
     }
   } catch (e) {
     console.log(e);

@@ -12,6 +12,7 @@ const router = express.Router();
 router.post("/signin", async (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
+  console.log(username, password);
 
   // checking if the user exists or not
   try {
@@ -83,6 +84,23 @@ router.post("/signup", async (req, res) => {
           res.sendStatus(200);
         }
       });
+    } else {
+      res.sendStatus(701);
+    }
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(701);
+  }
+});
+
+// check if the username already exists
+router.get("/checkUsername/:username", async (req, res) => {
+  try {
+    const username = req.params.username;
+    const userDocument = await User.findOne({ username: username });
+    console.log(username, userDocument);
+    if (userDocument === null) {
+      res.sendStatus(200);
     } else {
       res.sendStatus(701);
     }
