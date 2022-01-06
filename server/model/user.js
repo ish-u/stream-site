@@ -19,6 +19,17 @@ const UserSchema = new mongoose.Schema({
   streamKey: reqStr,
   followers: [userRef],
   following: [userRef],
+  streamTitle: String,
+  liveStatus: {
+    type: String,
+    enum: ["OFFLINE", "ONLINE"],
+    required: true,
+    default: "OFFLINE",
+  },
+  viewers: {
+    type: Number,
+    default: 0,
+  },
 });
 
 export default mongoose.model("User", UserSchema);

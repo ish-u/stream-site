@@ -4,6 +4,7 @@ import Home from "../views/Home.vue";
 import SignIn from "../views/SignIn.vue";
 import SignUp from "../views/SignUp.vue";
 import Profile from "../views/Profile.vue";
+import Stream from "../views/Stream.vue";
 import Error404 from "../views/Error404.vue";
 import store from "../store";
 
@@ -26,11 +27,16 @@ const routes = [
     component: SignIn,
   },
   {
-    path: "/:user",
+    path: "/me",
     name: "Profile",
     component: Profile,
   },
-
+  {
+    path: "/:user",
+    name: "Stream",
+    component: Stream,
+    props: true,
+  },
   {
     path: "*",
     name: "404",
@@ -55,13 +61,11 @@ const router = new VueRouter({
 
 // authentication middleware using Navigation Guards
 router.beforeEach((to, from, next) => {
-  const publicPages = ["Sign In", "Sign Up", "Home"];
+  const publicPages = ["Sign In", "Sign Up", "Home", "Stream"];
   const needAuth = !publicPages.includes(to.name);
   const isLoggedIn = store.getters.isLoggedIn;
   if (needAuth && !isLoggedIn) {
     next({ name: "Sign In" });
-  } else if (!needAuth && isLoggedIn && to.name !== "Home") {
-    next({ name: "Home" });
   }
   next();
 });

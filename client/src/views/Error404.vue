@@ -8,7 +8,10 @@
       class="flex-column"
     >
       <span class="text-h1">404</span>
+      <br />
       <span class="text-h3">._______.</span>
+      <br />
+      <br />
       <span class="text-h5">let's get <a href="/">home</a> </span>
     </v-row>
   </v-container>

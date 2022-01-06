@@ -117,7 +117,16 @@ router.post("/verfiy", async (req, res) => {
     const streamkey = req.body.key;
     const user = await User.findOne({ username: req.body.name });
     if (user !== null && user.streamKey === streamkey) {
-      res.sendStatus(200);
+      user.liveStatus = "ONLINE";
+      // saving the new User Document
+      await user.save((err, data) => {
+        console.log(data);
+        if (err) {
+          res.sendStatus(701);
+        } else {
+          res.sendStatus(200);
+        }
+      });
       return;
     }
     // rejecting the ability to stream if incorrect stream key is given
@@ -126,6 +135,37 @@ router.post("/verfiy", async (req, res) => {
     console.log(e);
     res.sendStatus(701);
   }
+});
+
+// set the livestatus to offline
+router.post("/set-offline", async (req, res) => {
+  console.log("OFFLINE");
+  try {
+    const user = await User.findOne({ username: req.body.name });
+    user.liveStatus = "OFFLINE";
+    // saving the new User Document
+    await user.save((err, data) => {
+      if (err) {
+        res.sendStatus(701);
+      } else {
+        res.sendStatus(200);
+      }
+    });
+    return;
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(701);
+  }
+});
+
+router.get("/play", (req, res) => {
+  console.log("PLAY");
+  res.sendStatus(200);
+});
+
+router.get("/stop", (req, res) => {
+  console.log("STOP");
+  res.sendStatus(200);
 });
 
 // exporting the router

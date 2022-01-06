@@ -25,6 +25,7 @@ const authenticateToken = (req, res, next) => {
 
 // index route
 router.get("/home", authenticateToken, (req, res) => {
+  console.log("NEW");
   res.send(req.user);
 });
 
@@ -77,12 +78,6 @@ router.patch("/follow/:username", authenticateToken, async (req, res) => {
       username: userToFollow,
     });
 
-    console.log(
-      currentUser,
-      currentUserDocument,
-      userToFollow,
-      userToFollowDocument
-    );
     if (currentUserDocument !== null && userToFollowDocument !== null) {
       var currentUserFollowing = currentUserDocument.following;
       var userToFollowFollowers = userToFollowDocument.followers;
@@ -110,8 +105,131 @@ router.patch("/follow/:username", authenticateToken, async (req, res) => {
   }
 });
 
+// unfollow a user
+router.patch("/unfollow/:username", authenticateToken, async (req, res) => {
+  try {
+    const currentUser = req.user.username;
+    const userToUnfollow = req.params.username;
+    const currentUserDocument = await User.findOne({ username: currentUser });
+    const userToUnfollowDocument = await User.findOne({
+      username: userToUnfollow,
+    });
+    if (currentUserDocument !== null && userToUnfollowDocument !== null) {
+      var currentUserFollowing = currentUserDocument.following;
+      var userToUnfollowFollowers = userToUnfollowDocument.followers;
+      if (
+        currentUserFollowing.includes(userToUnfollowDocument._id) &&
+        userToUnfollowFollowers.includes(currentUserDocument._id)
+      ) {
+        // updating user following
+        var index = currentUserFollowing.indexOf(userToUnfollowDocument._id);
+        console.log(index);
+        currentUserFollowing.splice(index, 1);
+        currentUserDocument.following = currentUserFollowing;
+        await currentUserDocument.save();
+        // updating followed user followers
+        var index = userToUnfollowFollowers.indexOf(currentUserDocument._id);
+        console.log(index);
+        userToUnfollowFollowers.splice(index, 1);
+        userToUnfollowDocument.followers = userToUnfollowFollowers;
+        await userToUnfollowDocument.save();
+        res.sendStatus(200);
+      } else {
+        res.sendStatus(701);
+      }
+    }
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(701);
+  }
+});
+
+// get the followers
+router.get("/followers/:username", async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.params.username });
+    if (user !== null) {
+      console.log(user.followers);
+      const followers = await User.find({ _id: { $in: user.followers } });
+      console.log(followers);
+      res.status(200);
+      res.send(followers);
+    } else {
+      res.sendStatus(701);
+    }
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(701);
+  }
+});
+
+// get following
+router.get("/following/:username", async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.params.username });
+    if (user !== null) {
+      console.log(user.following);
+      const following = await User.find(
+        { _id: { $in: user.following } },
+        { password: 0, _id: 0, streamKey: 0, email: 0 }
+      );
+      res.status(200);
+      res.send(following);
+    } else {
+      res.sendStatus(701);
+    }
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(701);
+  }
+});
+
+// search
+router.get("/search/:username", async (req, res) => {
+  try {
+    const users = await User.find({
+      username: new RegExp(req.params.username),
+    });
+    if (users !== null) {
+      res.status(200);
+      res.send(users);
+    } else {
+      res.sendStatus(701);
+    }
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(701);
+  }
+});
+
+// change title
+router.patch("/set-title/:title", authenticateToken, async (req, res) => {
+  try {
+    // finding the user document
+    const user = await User.findOne({ username: req.user.username });
+    if (user !== null && req.params.title !== null) {
+      //setting the stream title
+      user.streamTitle = req.params.title;
+      await user.save((err, data) => {
+        if (err) {
+          res.sendStatus(701);
+        } else {
+          // sending the new title to the client
+          res.status(200);
+          res.send({
+            title: data.streamTitle,
+          });
+        }
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(701);
+  }
+});
+
 // reset stream key
-router.get("/reset-stream-key", authenticateToken, async (req, res) => {
+router.patch("/reset-stream-key", authenticateToken, async (req, res) => {
   try {
     // finding the user document
     const user = await User.findOne({ username: req.user.username });
@@ -122,7 +240,7 @@ router.get("/reset-stream-key", authenticateToken, async (req, res) => {
         if (err) {
           res.sendStatus(701);
         } else {
-          // saending the new stram key to the client
+          // sending the new stram key to the client
           res.status(200);
           res.send({
             streamKey: data.streamKey,
