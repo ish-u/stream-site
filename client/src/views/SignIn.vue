@@ -110,8 +110,11 @@ export default {
             console.log(err);
           }
         })
-        .catch(() => {
+        .catch((err) => {
+          console.log("SIGN IN ", err);
+          this.loading = false;
           this.alert = true;
+          return;
         })
         .finally(() => {
           this.loading = false;

@@ -4,7 +4,6 @@
     :search-input.sync="search"
     :items="items"
     item-text="username"
-    autofocus
     class="mx-4"
     outlined
     hide-details

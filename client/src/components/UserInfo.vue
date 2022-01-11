@@ -1,9 +1,9 @@
 <template>
-  <v-card width="inherit" outlined>
-    <v-container>
+  <v-card width="inherit" outlined class="mt-4 pa-0">
+    <v-container fluid class="ma-0 pa-0">
       <v-row>
         <v-col>
-          <v-list>
+          <v-list width="inherit">
             <v-list-item>
               <v-list-item-avatar
                 :height="!$vuetify.breakpoint.mobile ? '72' : '48'"
@@ -33,7 +33,7 @@
 
               <v-list-item-action>
                 <v-btn
-                  :disabled="user.username === $store.state.user.username"
+                  :disabled="user.username === currentUser"
                   color="black"
                   class="ma-2 white--text"
                   :small="$vuetify.breakpoint.mobile"
@@ -116,6 +116,9 @@ export default {
   computed: {
     following() {
       return this.$store.getters.followingUsers.includes(this.user.username);
+    },
+    currentUser() {
+      return this.$store.state.user !== null && this.$store.state.user.username;
     },
   },
 };

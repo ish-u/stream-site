@@ -21,13 +21,14 @@ export default new Vuex.Store({
       state.following = following;
     },
     SET_LOADING(state, loading) {
-      console.log(loading);
       state.loading = loading;
     },
   },
   actions: {
     getAccessToken(context, payload) {
+      // bug
       context.commit("SET_LOADING", true);
+      // bug
       const { username, password } = payload;
       return new Promise((resolve, reject) => {
         const requestOptions = {
@@ -119,7 +120,6 @@ export default new Vuex.Store({
                 return res.json();
               })
               .then((resJSON) => {
-                console.log(resJSON);
                 context.commit("SET_FOLLOWING", resJSON);
                 resolve();
               })

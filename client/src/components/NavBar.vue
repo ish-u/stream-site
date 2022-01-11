@@ -230,6 +230,8 @@ export default {
     signOut() {
       this.$store.dispatch("removeAccessToken");
       this.$router.push({ name: "Sign In" });
+      this.$store.commit("SET_USER_DATA", null);
+      this.$store.commit("SET_FOLLOWING", []);
     },
   },
   computed: {

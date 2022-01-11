@@ -2,52 +2,60 @@
   <v-container
     fluid
     :class="!$vuetify.breakpoint.smAndDown && isSignedIn ? 'pl-16' : ''"
+    style="height: 100%"
   >
     <template v-if="!loading && exists">
-      <v-row :style="`height:${height}`">
-        <v-col
-          style="height: inherit; justify-content: center; align-items: center"
-          class="d-flex"
-          cols="12"
-          lg="9"
-          sm="12"
-          md="9"
-          xl="10"
-        >
-          <video-player v-if="showLive" />
-          <v-progress-circular
-            v-else-if="showLiveProgress"
-            indeterminate
-            color="red"
-          ></v-progress-circular>
-          <span class="text-h3" v-else>OFFLINE</span>
-        </v-col>
-        <v-col
-          cols="12"
-          lg="3"
-          sm="12"
-          md="3"
-          xl="2"
-          style="height: 90vh"
-          v-if="!$vuetify.breakpoint.smAndDown"
-        >
+      <v-row>
+        <v-col :style="`height:${height}`">
+          <video-player
+            v-if="showLive"
+            :toggleChatButton="!showChat"
+            @toggleChat="toggleChat"
+          />
           <v-card
             class="d-flex"
-            style="
-              height: 100%;
-              width: inherit;
-              justify-content: center;
-              align-items: center;
-            "
+            v-else
+            fluid
+            style="height: 100%; justify-content: center; align-items: center"
             outlined
           >
-            <span class="text-h3"> CHAT </span>
+            <v-btn
+              class="mt-2 mr-2"
+              absolute
+              right
+              x-small
+              fab
+              dark
+              depressed
+              v-if="!showChat"
+              @click="toggleChat"
+            >
+              <v-icon> mdi-arrow-left </v-icon>
+            </v-btn>
+            <v-progress-circular
+              v-if="showLiveProgress"
+              indeterminate
+              color="red"
+            ></v-progress-circular>
+
+            <span v-else class="text-h3">OFFLINE</span>
           </v-card>
-        </v-col>
-      </v-row>
-      <v-row class="mt-6">
-        <v-col style="height: inherit" cols="12" lg="9" sm="12" md="9" xl="10">
           <user-info :user="userData" @updateUser="getUser" />
+        </v-col>
+        <v-col
+          :style="
+            !$vuetify.breakpoint.smAndDown
+              ? 'display:block; height:90vh'
+              : 'display:none'
+          "
+          cols="3"
+          v-show="showChat"
+        >
+          <chat
+            v-if="!loading && exists"
+            :streamingUser="userData.username"
+            @toggleChat="toggleChat"
+          />
         </v-col>
       </v-row>
     </template>
@@ -62,6 +70,7 @@
 import Error404 from "../views/Error404.vue";
 import VideoPlayer from "../components/VideoPlayer.vue";
 import UserInfo from "../components/UserInfo.vue";
+import Chat from "../components/Chat.vue";
 
 export default {
   name: "Stream",
@@ -69,6 +78,7 @@ export default {
     error: Error404,
     VideoPlayer,
     UserInfo,
+    Chat,
   },
   data() {
     return {
@@ -79,11 +89,15 @@ export default {
       updateUser: null,
       showLive: false,
       showLiveProgress: false,
+      showChat: true,
     };
   },
   methods: {
     getUsername() {
       return this.username;
+    },
+    toggleChat() {
+      this.showChat = !this.showChat;
     },
     async getUser() {
       // console.log("UPDATE STREAM");
@@ -137,14 +151,11 @@ export default {
   },
   computed: {
     height() {
-      console.log(this.$vuetify.breakpoint.name);
       switch (this.$vuetify.breakpoint.name) {
         case "xs":
           return "30vh";
-        case "sm":
-          return "50vh";
         default:
-          return "70vh";
+          return "75vh";
       }
     },
     isSignedIn() {
@@ -165,5 +176,3 @@ export default {
   },
 };
 </script>
-
-<style></style>

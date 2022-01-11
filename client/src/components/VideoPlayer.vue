@@ -1,5 +1,19 @@
 <template>
-  <v-card style="height: inherit; width: 100%" outlined class="pa-1 mt-2">
+  <v-card style="height: 100%; width: 100%" outlined class="pa-1">
+    <v-btn
+      class="mt-2 mr-2"
+      @click="$emit('toggleChat')"
+      absolute
+      right
+      small
+      fab
+      dark
+      depressed
+      v-if="toggleChatButton"
+    >
+      <v-icon> mdi-arrow-left </v-icon>
+    </v-btn>
+
     <video
       class="video-js vjs-big-play-centered"
       ref="videoPlayer"
@@ -15,6 +29,9 @@ import "video.js/dist/video-js.css";
 
 export default {
   name: "VideoPlayer",
+  props: {
+    toggleChatButton: Boolean,
+  },
   data() {
     return {
       player: null,

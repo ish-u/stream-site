@@ -1,4 +1,5 @@
 import app from "./server.js";
+import socketIOServer from "./socket.js";
 import dotenv from "dotenv";
 import "process";
 import mongoose from "mongoose";
@@ -31,4 +32,9 @@ mongoose
 // Listening for Requests
 app.listen(PORT, () => {
   console.log(`Server Running on ${PORT}`);
+});
+
+// Listening to SocketIO Requests
+socketIOServer.listen(3000, () => {
+  console.log("Socket IO on port 3000");
 });
