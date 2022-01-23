@@ -29,3 +29,4 @@ docker-compose up
 - RTMP Server : `http://localhost:1935`
 - HLS Feed: `http://localhost:8000`
 - Express Server - `http://localhost:5000`
+- Socket.IO Server - `http://localhost:3000`
