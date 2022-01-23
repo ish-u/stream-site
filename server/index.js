@@ -1,5 +1,5 @@
 import app from "./server.js";
-import socketIOServer from "./socket.js";
+import { socketIOServer } from "./socket.js";
 import dotenv from "dotenv";
 import "process";
 import mongoose from "mongoose";

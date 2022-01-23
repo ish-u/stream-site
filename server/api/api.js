@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import express from "express";
 import { v4 as uuid } from "uuid";
 import User from "../model/user.js";
-
+import { io } from "../socket.js";
 // Express Router
 const router = express.Router();
 
@@ -149,9 +149,7 @@ router.get("/followers/:username", async (req, res) => {
   try {
     const user = await User.findOne({ username: req.params.username });
     if (user !== null) {
-      console.log(user.followers);
       const followers = await User.find({ _id: { $in: user.followers } });
-      console.log(followers);
       res.status(200);
       res.send(followers);
     } else {
@@ -168,7 +166,6 @@ router.get("/following/:username", async (req, res) => {
   try {
     const user = await User.findOne({ username: req.params.username });
     if (user !== null) {
-      console.log(user.following);
       const following = await User.find(
         { _id: { $in: user.following } },
         { password: 0, _id: 0, streamKey: 0, email: 0 }
@@ -187,9 +184,12 @@ router.get("/following/:username", async (req, res) => {
 // search
 router.get("/search/:username", async (req, res) => {
   try {
-    const users = await User.find({
-      username: new RegExp(req.params.username),
-    });
+    const users = await User.find(
+      {
+        username: new RegExp(req.params.username),
+      },
+      { password: 0, _id: 0, streamKey: 0, email: 0 }
+    );
     if (users !== null) {
       res.status(200);
       res.send(users);
@@ -210,6 +210,11 @@ router.patch("/set-title/:title", authenticateToken, async (req, res) => {
     if (user !== null && req.params.title !== null) {
       //setting the stream title
       user.streamTitle = req.params.title;
+
+      io.to(user.username).emit("newTitle", {
+        newTitle: user.streamTitle,
+      });
+
       await user.save((err, data) => {
         if (err) {
           res.sendStatus(701);
@@ -219,6 +224,47 @@ router.patch("/set-title/:title", authenticateToken, async (req, res) => {
           res.send({
             title: data.streamTitle,
           });
+        }
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(701);
+  }
+});
+
+router.patch("/add-client", authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.user.username });
+    if (user !== null) {
+      user.clients.push(req.body.client);
+      await user.save((err, data) => {
+        if (err) {
+          console.log(err);
+          res.sendStatus(701);
+        } else {
+          res.sendStatus(200);
+        }
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(701);
+  }
+});
+
+router.patch("/remove-client", authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.user.username });
+    if (user !== null) {
+      user.clients = user.clients.filter(
+        (client) => client !== req.body.client
+      );
+      await user.save((err, data) => {
+        if (err) {
+          res.sendStatus(701);
+        } else {
+          res.sendStatus(200);
         }
       });
     }

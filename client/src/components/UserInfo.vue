@@ -5,9 +5,10 @@
         <v-col>
           <v-list width="inherit">
             <v-list-item>
+              <!-- Profile Picture -->
               <v-list-item-avatar
-                :height="!$vuetify.breakpoint.mobile ? '72' : '48'"
-                :width="!$vuetify.breakpoint.mobile ? '72' : '48'"
+                :height="!$vuetify.breakpoint.mobile ? '72' : '52'"
+                :width="!$vuetify.breakpoint.mobile ? '72' : '52'"
                 :style="
                   user.liveStatus === 'ONLINE'
                     ? 'border: green solid;'
@@ -16,21 +17,35 @@
               >
                 <v-img :src="user.profile"></v-img>
               </v-list-item-avatar>
+
+              <!-- User Details -->
               <v-list-item-content>
+                <!-- User Name -->
                 <v-list-item-title
-                  :class="!$vuetify.breakpoint.mobile ? 'text-h4' : 'text-h5'"
+                  :class="!$vuetify.breakpoint.mobile ? 'text-h5' : 'text-h6'"
                 >
-                  {{ user.name }}
+                  {{ user.username }}
                 </v-list-item-title>
+                <!-- Stream Title -->
                 <v-list-item-subtitle
-                  :class="!$vuetify.breakpoint.mobile ? 'text-h6' : ''"
+                  :class="!$vuetify.breakpoint.mobile ? 'body-1' : 'body-2'"
                   >{{ user.streamTitle }}</v-list-item-subtitle
                 >
               </v-list-item-content>
+
+              <!-- View Count -->
+              <v-list-item-action
+                :class="!$vuetify.breakpoint.mobile ? 'mr-6' : 'mr-n3'"
+              >
+                <v-chip> <v-icon left>mdi-eye</v-icon> {{ view }} </v-chip>
+              </v-list-item-action>
+
+              <!-- Followers Count -->
               <v-list-item-action v-if="!$vuetify.breakpoint.mobile">
                 <v-chip> {{ user.followers.length }} Followers </v-chip>
               </v-list-item-action>
 
+              <!-- Following Button -->
               <v-list-item-action>
                 <v-btn
                   :disabled="user.username === currentUser"
@@ -38,8 +53,17 @@
                   class="ma-2 white--text"
                   :small="$vuetify.breakpoint.mobile"
                   @click="toggleFollow"
-                  >{{ following ? "Following" : "Follow" }}
-                  <v-icon v-if="!following" dark right> mdi-heart </v-icon>
+                >
+                  {{
+                    !$vuetify.breakpoint.mobile
+                      ? following
+                        ? "Following"
+                        : "Follow"
+                      : ""
+                  }}
+                  <v-icon dark :right="!$vuetify.breakpoint.mobile">
+                    {{ following ? "mdi-heart" : "mdi-cards-heart-outline" }}
+                  </v-icon>
                 </v-btn>
               </v-list-item-action>
             </v-list-item>
@@ -55,8 +79,10 @@ export default {
   name: "UserInfo",
   props: {
     user: Object,
+    view: Number,
   },
   methods: {
+    // follow the current user
     async follow() {
       const requestOptions = {
         method: "PATCH",
@@ -81,6 +107,7 @@ export default {
           console.log(err);
         });
     },
+    // unfollow the current user
     async unfollow() {
       const requestOptions = {
         method: "PATCH",

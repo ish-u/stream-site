@@ -7,11 +7,13 @@
     <template v-if="!loading && exists">
       <v-row>
         <v-col :style="`height:${height}`">
+          <!-- VIDEO PLAYER COMPONENT -->
           <video-player
             v-if="showLive"
             :toggleChatButton="!showChat"
             @toggleChat="toggleChat"
           />
+
           <v-card
             class="d-flex"
             v-else
@@ -19,6 +21,7 @@
             style="height: 100%; justify-content: center; align-items: center"
             outlined
           >
+            <!-- Chat Show Hide Button -->
             <v-btn
               class="mt-2 mr-2"
               absolute
@@ -32,16 +35,22 @@
             >
               <v-icon> mdi-arrow-left </v-icon>
             </v-btn>
+
+            <!-- Progress Bar - shown for inital load of any Stream  -->
             <v-progress-circular
               v-if="showLiveProgress"
               indeterminate
               color="red"
             ></v-progress-circular>
 
+            <!-- OFFLINE text which is displayed when the User liveStatus is OFFLINE -->
             <span v-else class="text-h3">OFFLINE</span>
           </v-card>
-          <user-info :user="userData" @updateUser="getUser" />
+
+          <!-- USER INFO COMPONENT -->
+          <user-info :user="userData" :view="viewers" @updateUser="getUser" />
         </v-col>
+
         <v-col
           :style="
             !$vuetify.breakpoint.smAndDown
@@ -49,8 +58,10 @@
               : 'display:none'
           "
           cols="3"
+          class="chat"
           v-show="showChat"
         >
+          <!-- CHAT COMPONENT -->
           <chat
             v-if="!loading && exists"
             :streamingUser="userData.username"
@@ -60,6 +71,7 @@
       </v-row>
     </template>
 
+    <!-- ERROR COMPONENT -->
     <template v-else-if="!loading && !exists">
       <error />
     </template>
@@ -90,7 +102,31 @@ export default {
       showLive: false,
       showLiveProgress: false,
       showChat: true,
+      viewers: 0,
     };
+  },
+  sockets: {
+    // Updating the LIVE STATUS of the Stream
+    liveStatus: function (message) {
+      this.userData.liveStatus = message.status;
+      if (message.status === "ONLINE") {
+        this.showLiveProgress = true;
+        setTimeout(() => {
+          this.showLiveProgress = false;
+          this.showLive = true;
+        }, 5000);
+      } else {
+        this.showLive = false;
+      }
+    },
+    // Updating the Title of the Stream
+    newTitle: function (title) {
+      this.userData.streamTitle = title.newTitle;
+    },
+    // Updating the View Count of the Stream
+    updateView: function (view) {
+      this.viewers = view.count;
+    },
   },
   methods: {
     getUsername() {
@@ -99,6 +135,7 @@ export default {
     toggleChat() {
       this.showChat = !this.showChat;
     },
+    // Get the User Data whose Stream Page is Opened
     async getUser() {
       // console.log("UPDATE STREAM");
       const requestOptions = {
@@ -142,14 +179,12 @@ export default {
   },
   created() {
     this.getUser();
-    this.updateUser = setInterval(() => {
-      this.getUser();
-    }, 10000);
   },
-  beforeDestroy() {
-    clearInterval(this.updateUser);
+  destroyed() {
+    this.$socket.emit("leave-room", this.userData.username);
   },
   computed: {
+    // for the height of the video player
     height() {
       switch (this.$vuetify.breakpoint.name) {
         case "xs":
@@ -163,16 +198,22 @@ export default {
     },
   },
   watch: {
+    // reseting the player on the chnage of 'User'
     $route(to, from) {
+      console.log(to, from);
       if (to.params.user !== from.params.user) {
+        this.showLive = false;
+        this.showLiveProgress = true;
         this.username = to.params.user;
-        clearInterval(this.updateUser);
         this.getUser();
-        this.updateUser = setInterval(() => {
-          this.getUser();
-        }, 10000);
       }
     },
   },
 };
 </script>
+
+<style scoped>
+.chat {
+  display: none;
+}
+</style>

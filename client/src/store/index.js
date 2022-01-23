@@ -26,9 +26,6 @@ export default new Vuex.Store({
   },
   actions: {
     getAccessToken(context, payload) {
-      // bug
-      context.commit("SET_LOADING", true);
-      // bug
       const { username, password } = payload;
       return new Promise((resolve, reject) => {
         const requestOptions = {

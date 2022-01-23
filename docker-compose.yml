@@ -16,6 +16,7 @@ services:
     container_name: rtmp_server
     depends_on:
       - server
+      - "mongodb"
     volumes:
       - ./data:/temp/hls
   mongodb:

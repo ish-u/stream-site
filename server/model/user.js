@@ -26,6 +26,7 @@ const UserSchema = new mongoose.Schema({
     required: true,
     default: "OFFLINE",
   },
+  clients: [String],
   viewers: {
     type: Number,
     default: 0,

@@ -43,7 +43,7 @@ export default {
           {
             withCredentials: false,
             type: "application/x-mpegURL",
-            src: `${process.env.VUE_APP_HLS}/${this.$route.params.user}.m3u8`,
+            src: "this.source",
           },
         ],
         controlBar: {
@@ -55,6 +55,34 @@ export default {
         poster: "",
       },
     };
+  },
+  created() {
+    // Setting the default channels
+    switch (this.$route.params.user) {
+      case "user1":
+        //  Disney trailer
+        this.options.sources[0].src =
+          "http://playertest.longtailvideo.com/adaptive/oceans_aes/oceans_aes.m3u8";
+        break;
+      case "user2":
+        //  Tears of Stell
+        this.options.sources[0].src =
+          "http://content.jwplatform.com/manifests/vM7nH0Kl.m3u8";
+        break;
+      case "user3":
+        // Sintel (Project Durian)
+        this.options.sources[0].src =
+          "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8";
+        break;
+      case "user4":
+        // Big Buck Bunny
+        this.options.sources[0].src =
+          "https://multiplatform-f.akamaihd.net/i/multi/will/bunny/big_buck_bunny_,640x360_400,640x360_700,640x360_1000,950x540_1500,.f4v.csmil/master.m3u8";
+        break;
+      default:
+        this.options.sources[0].src = `${process.env.VUE_APP_HLS}/${this.$route.params.user}.m3u8`;
+        break;
+    }
   },
   mounted() {
     this.player = videojs(

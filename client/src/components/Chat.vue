@@ -94,7 +94,7 @@ export default {
         );
         var newMessage = {
           id: Math.random() * Math.random(),
-          user: this.streamingUser,
+          user: this.user.username,
           message: this.message,
           time: new Date(),
         };

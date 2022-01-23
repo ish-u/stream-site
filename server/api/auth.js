@@ -4,6 +4,7 @@ import express from "express";
 import gravatar from "gravatar";
 import { v4 as uuidv4 } from "uuid";
 import User from "../model/user.js";
+import { io } from "../socket.js";
 
 // Express Router
 const router = express.Router();
@@ -110,14 +111,27 @@ router.get("/checkUsername/:username", async (req, res) => {
   }
 });
 
-// route to veify the stream key
+// route to veify the stream key and set status to ONLINE
 router.post("/verfiy", async (req, res) => {
   try {
+    console.log("VERIFY", req.body);
     // streamkey
     const streamkey = req.body.key;
     const user = await User.findOne({ username: req.body.name });
     if (user !== null && user.streamKey === streamkey) {
       user.liveStatus = "ONLINE";
+
+      io.to(user.username).emit("liveStatus", {
+        status: "ONLINE",
+      });
+
+      user.clients.forEach((client) => {
+        console.log(client);
+        io.to(client).emit("liveStatus", {
+          status: "ONLINE",
+        });
+      });
+
       // saving the new User Document
       await user.save((err, data) => {
         console.log(data);
@@ -137,35 +151,39 @@ router.post("/verfiy", async (req, res) => {
   }
 });
 
-// set the livestatus to offline
+// set the livestatus to OFFLINE
 router.post("/set-offline", async (req, res) => {
-  console.log("OFFLINE");
   try {
+    console.log("VERIFY", req.body);
     const user = await User.findOne({ username: req.body.name });
-    user.liveStatus = "OFFLINE";
-    // saving the new User Document
-    await user.save((err, data) => {
-      if (err) {
-        res.sendStatus(701);
-      } else {
-        res.sendStatus(200);
-      }
-    });
+    if (user !== null && user.streamKey === streamkey) {
+      user.liveStatus = "OFFLINE";
+
+      io.to(user.username).emit("liveStatus", {
+        status: "OFFLINE",
+      });
+
+      user.clients.forEach((client) => {
+        console.log(client);
+        io.to(client).emit("liveStatus", {
+          status: "OFFLINE",
+        });
+      });
+
+      // saving the new User Document
+      await user.save((err, data) => {
+        if (err) {
+          res.sendStatus(701);
+        } else {
+          res.sendStatus(200);
+        }
+      });
+    }
     return;
   } catch (e) {
     console.log(e);
     res.sendStatus(701);
   }
-});
-
-router.get("/play", (req, res) => {
-  console.log("PLAY");
-  res.sendStatus(200);
-});
-
-router.get("/stop", (req, res) => {
-  console.log("STOP");
-  res.sendStatus(200);
 });
 
 // exporting the router

@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-row class="black--text ma-6" align="center" justify="center">
-      <v-col offset="1">
+      <v-col :offset="!$vuetify.breakpoint.smAndDown ? 1 : 0">
         <span :class="!$vuetify.breakpoint.smAndDown ? 'text-h4' : 'text-h6'">
           welcome to
         </span>
@@ -35,16 +35,56 @@
         </v-sheet>
       </v-col>
     </v-row>
+    <v-row justify="center">
+      <!-- Featured Streamers Slider -->
+      <slider title="Featured Streamer" :users="this.users" />
+    </v-row>
   </v-container>
 </template>
 
 <script>
+import Slider from "../components/Slider.vue";
 export default {
   name: "Home",
+  components: {
+    Slider,
+  },
+  data() {
+    return {
+      users: [],
+    };
+  },
+  methods: {
+    // get the featured users
+    getFeatured() {
+      const requestOptions = {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+      fetch(`${process.env.VUE_APP_API}/api/search/user`, requestOptions)
+        .then((res) => {
+          if (res.status === 200) {
+            return res.json();
+          }
+          throw "ERROR";
+        })
+        .then((resJSON) => {
+          this.users = resJSON;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+  },
   computed: {
     isSignedIn() {
       return this.$store.getters.isLoggedIn;
     },
+  },
+  created() {
+    this.getFeatured();
   },
 };
 </script>

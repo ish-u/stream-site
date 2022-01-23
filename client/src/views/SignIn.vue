@@ -103,12 +103,12 @@ export default {
           password: this.password,
         })
         .then(() => {
-          this.$router.push({ name: "Home" });
           try {
             this.$store.dispatch("getUserData");
           } catch (err) {
             console.log(err);
           }
+          this.$router.push({ name: "Home" });
         })
         .catch((err) => {
           console.log("SIGN IN ", err);

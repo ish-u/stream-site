@@ -4,7 +4,10 @@
       <v-app-bar-nav-icon class="d-md-none" @click="drawer = true">
       </v-app-bar-nav-icon>
       <v-app-bar-title>
-        <span class="black white--text pa-2" @click="goToHomeView">
+        <span
+          class="black white--text py-3 px-2 ml-0 mr-1"
+          @click="goToHomeView"
+        >
           stream site
         </span>
       </v-app-bar-title>
@@ -48,7 +51,7 @@
                 class="mr-4"
               >
                 <v-avatar>
-                  <img :src="user.profile" alt="" />
+                  <img :src="user.profile" alt="user profile" />
                 </v-avatar>
               </v-btn>
             </template>
@@ -84,7 +87,7 @@
     </v-app-bar>
 
     <!-- Top Navigation Drawer -->
-    <v-navigation-drawer v-model="drawer" absolute temporary>
+    <v-navigation-drawer class="top-nav" v-model="drawer" absolute temporary>
       <template v-slot:prepend v-if="isSignedIn">
         <v-list-item two-line @click="goToProfileView">
           <v-list-item-avatar>
@@ -164,7 +167,7 @@
         @click="gotoUserStream(u.username)"
       >
         <v-list-item-avatar>
-          <img :src="u.profile" />
+          <img style="border: solid black 2px" :src="u.profile" />
         </v-list-item-avatar>
         <v-list-item-content>
           <v-list-item-title>{{ u.username }}</v-list-item-title>
@@ -192,6 +195,7 @@ export default {
     };
   },
   methods: {
+    // Navbar Authentication Function
     goToHomeView() {
       if (this.$route.name !== "Home") {
         this.$router.push({ name: "Home" });
@@ -220,7 +224,6 @@ export default {
     },
     gotoUserStream(user) {
       if (this.$route.params.user !== user) {
-        console.log(user);
         this.$router.push({ name: "Stream", params: { user: user } });
         this.mini = true;
       } else {
@@ -236,7 +239,7 @@ export default {
   },
   computed: {
     isSignedIn() {
-      return this.$store.getters.isLoggedIn;
+      return this.$store.getters.isLoggedIn && this.user !== null;
     },
     user() {
       return this.$store.state.user;
@@ -248,4 +251,11 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.v-navigation-drawer {
+  height: calc(100vh - 64px) !important;
+}
+.top-nav {
+  height: 100%;
+}
+</style>

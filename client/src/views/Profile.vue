@@ -91,7 +91,7 @@
                 <v-card outlined>
                   <v-card-title>View Count </v-card-title>
                   <v-card-text>
-                    <span class="text-h4"> -</span>
+                    <span class="text-h4"> {{ user.viewers }} </span>
                   </v-card-text>
                 </v-card>
               </v-col>
@@ -121,15 +121,42 @@
               </v-col>
               <v-col xl="7" lg="7" md="7" sm="8" cols="12">
                 <v-text-field
-                  :append-icon="showStreamKey ? 'mdi-eye' : 'mdi-eye-off'"
                   :type="showStreamKey ? 'text' : 'password'"
                   outlined
-                  @click:append="showStreamKey = !showStreamKey"
                   v-model="user.streamKey"
                   hint="At least 8 characters"
                   hide-details="true"
                   readonly
                 >
+                  <template slot="append">
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-icon v-bind="attrs" v-on="on" @click="copy" left>
+                          mdi-content-copy
+                        </v-icon>
+                      </template>
+                      <span>Copy Stream Key</span>
+                    </v-tooltip>
+
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-icon
+                          v-bind="attrs"
+                          v-on="on"
+                          @click="showStreamKey = !showStreamKey"
+                          right
+                          >{{
+                            showStreamKey ? "mdi-eye" : "mdi-eye-off"
+                          }}</v-icon
+                        >
+                      </template>
+                      <span>
+                        {{
+                          !showStreamKey ? "Show Stream Key" : "Hide Stream Key"
+                        }}
+                      </span>
+                    </v-tooltip>
+                  </template>
                 </v-text-field>
               </v-col>
             </v-row>
@@ -150,6 +177,20 @@
         </v-card>
       </v-container>
     </v-row>
+
+    <!-- <v-row>
+      <v-col>
+        <v-carousel v-model="model">
+          <v-carousel-item v-for="(color, i) in colors" :key="color">
+            <v-sheet :color="color" height="100%" tile>
+              <v-row class="fill-height" align="center" justify="center">
+                <div class="text-h2">Slide {{ i + 1 }}</div>
+              </v-row>
+            </v-sheet>
+          </v-carousel-item>
+        </v-carousel>
+      </v-col>
+    </v-row> -->
   </v-container>
 </template>
 
@@ -161,6 +202,8 @@ export default {
       showStreamKey: false,
       loadingTitle: false,
       loadingStreamKey: false,
+      // model: 0,
+      // colors: ["primary", "secondary", "yellow darken-2", "red", "orange"],
     };
   },
   methods: {
@@ -224,6 +267,13 @@ export default {
         .finally(() => {
           this.loadingStreamKey = false;
         });
+    },
+    copy() {
+      navigator.clipboard.writeText(this.user.streamKey);
+      // const input = this.$refs[field].$refs.input;
+      // input.select();
+      // document.execCommand("copy");
+      // input.setSelectionRange(0, 0); // unselect
     },
   },
   computed: {
