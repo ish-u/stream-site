@@ -34,6 +34,8 @@ export default {
       }
     },
     updateClientView: function (view) {
+      console.log(view);
+
       if (this.isSignedIn) {
         this.$store.state.user.viewers = view.count;
       }

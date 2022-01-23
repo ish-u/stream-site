@@ -11,6 +11,11 @@ Vue.use(
   new VueSocketIO({
     debug: true,
     connection: io("http://localhost:3000"),
+    vuex: {
+      store,
+      mutationPrefix: "SOCKET_",
+    },
+    options: {}, //Optional options
   })
 );
 

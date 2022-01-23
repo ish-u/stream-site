@@ -125,6 +125,7 @@ export default {
     },
     // Updating the View Count of the Stream
     updateView: function (view) {
+      console.log(view, this.viewers);
       this.viewers = view.count;
     },
   },

@@ -30,3 +30,8 @@ docker-compose up
 - HLS Feed: `http://localhost:8000`
 - Express Server - `http://localhost:5000`
 - Socket.IO Server - `http://localhost:3000`
+
+### DEMO
+
+will add a public demo later
+![img](/demo.gif)

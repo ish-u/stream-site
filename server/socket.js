@@ -45,6 +45,7 @@ io.on("connection", (socket) => {
       try {
         const user = await User.findOne({ username: socket.data.user });
         if (user !== null) {
+          console.log(user.clients, socket.id);
           user.clients = user.clients.filter((client) => client !== socket.id);
           await user.save((err, data) => {
             if (err) {
@@ -65,12 +66,12 @@ io.on("connection", (socket) => {
 
   // join a room
   socket.on("join-room", async (room) => {
-    // console.log(`${socket.id} joined ${room}`);
-    // socket.join(room);
+    console.log(`${socket.id} joined ${room}`);
+    socket.join(room);
     const views = (await io.in(room).fetchSockets()).length;
     io.to(room).emit("updateView", { count: views });
 
-    // sending views to clients
+    // sending views to
     try {
       const user = await User.findOne({ username: room });
       if (user !== null) {
@@ -86,7 +87,7 @@ io.on("connection", (socket) => {
   // leave a room
   socket.on("leave-room", async (room) => {
     console.log(`${socket.id} left ${room}`);
-    // socket.leave(room);
+    socket.leave(room);
     const views = (await io.in(room).fetchSockets()).length;
     io.to(room).emit("updateView", { count: views });
 
@@ -95,7 +96,7 @@ io.on("connection", (socket) => {
       const user = await User.findOne({ username: room });
       if (user !== null) {
         user.clients.forEach((client) => {
-          // console.log(client);
+          console.log(client);
           io.to(client).emit("updateClientView", { count: views });
         });
       }
