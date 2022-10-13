@@ -27,6 +27,13 @@ A Streaming Service made using Vue.JS, vuetify, nginx, socket.io
   cd stream-site
 ```
 
+### Add the `.env` file in server folder as -
+
+```bash
+DB_CONNECTION="mongodb://admin:password@mongodb:27017"
+ACCESS_TOKEN_SECRET="*YOUR SECRET*"
+```
+
 ### Build Images and Run to start the Express Server, RTMP Server, MongoDB and MongoExpress
 
 ```bash
