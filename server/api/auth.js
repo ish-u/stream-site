@@ -155,6 +155,8 @@ router.post("/verfiy", async (req, res) => {
 router.post("/set-offline", async (req, res) => {
   try {
     console.log("VERIFY", req.body);
+    // streamkey
+    const streamkey = req.body.key;
     const user = await User.findOne({ username: req.body.name });
     if (user !== null && user.streamKey === streamkey) {
       user.liveStatus = "OFFLINE";
