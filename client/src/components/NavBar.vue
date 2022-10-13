@@ -145,7 +145,11 @@
       permanent
       v-model="sideDrawer"
       :mini-variant="mini"
-      :style="!$vuetify.breakpoint.smAndDown ? 'height:90%' : 'display:none'"
+      :style="
+        !$vuetify.breakpoint.smAndDown
+          ? 'height:100% !important'
+          : 'display:none'
+      "
     >
       <v-list nav>
         <v-list-item-group>
